@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react"; // Add useRef and useEffect
 import { Link, useHistory } from "react-router-dom";
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
@@ -12,6 +12,7 @@ import borders from "assets/theme/base/borders";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 import bgSignIn from "assets/images/signInImage.png";
 import axios from "axios";
+import { gsap } from "gsap"; // Import GSAP
 
 function OrganizationSignUp() {
   const history = useHistory();
@@ -31,6 +32,8 @@ function OrganizationSignUp() {
     org_type: "",
     cause_categories: [],
   });
+
+  const formRef = useRef(null); // Create a ref for the form fields
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,17 +68,26 @@ function OrganizationSignUp() {
     }
   };
 
+  // Animate fields on mount
+  useEffect(() => {
+    const fields = formRef.current.children; // Get form fields
+    const tl = gsap.timeline();
+
+    for (let i = 0; i < fields.length; i++) {
+      tl.fromTo(fields[i], { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5 }, `+=0.25`); // 0.25 seconds delay
+    }
+  }, []);
+
   return (
     <CoverLayout
       title="Welcome, Organization!"
       color="white"
       description="Enter your organization's details to sign up"
       premotto="INSPIRED BY THE FUTURE:"
-      motto="THE VISION UI DASHBOARD"
+      motto="THE Vision ui DASHBOARD"
       image={bgSignIn}
     >
-      <VuiBox component="form" role="form" onSubmit={handleSubmit}>
-        
+      <VuiBox ref={formRef} component="form" role="form" onSubmit={handleSubmit}>
         {/* Email */}
         <VuiBox mb={2}>
           <VuiBox mb={1} ml={0.5}>
@@ -267,9 +279,10 @@ function OrganizationSignUp() {
             <VuiInput
               type="text"
               name="contact_name"
-              placeholder="Name of contact person..."
+              placeholder="Your contact name..."
               value={formData.contact_name}
               onChange={handleChange}
+              required
               fontWeight="500"
             />
           </GradientBorder>
@@ -295,9 +308,10 @@ function OrganizationSignUp() {
             <VuiInput
               type="email"
               name="contact_email"
-              placeholder="Email of contact person..."
+              placeholder="Your contact email..."
               value={formData.contact_email}
               onChange={handleChange}
+              required
               fontWeight="500"
             />
           </GradientBorder>
@@ -323,9 +337,10 @@ function OrganizationSignUp() {
             <VuiInput
               type="text"
               name="org_type"
-              placeholder="NGO, non-profit, etc..."
+              placeholder="Type of organization..."
               value={formData.org_type}
               onChange={handleChange}
+              required
               fontWeight="500"
             />
           </GradientBorder>
@@ -351,7 +366,7 @@ function OrganizationSignUp() {
             <VuiInput
               type="text"
               name="cause_categories"
-              placeholder="Environment, education, health, etc... (comma-separated)"
+              placeholder="Categories (comma-separated)..."
               value={formData.cause_categories.join(', ')}
               onChange={handleChange}
               fontWeight="500"
@@ -359,25 +374,40 @@ function OrganizationSignUp() {
           </GradientBorder>
         </VuiBox>
 
-        {/* Remember Me Switch */}
-        <VuiBox display="flex" alignItems="center">
-          <VuiSwitch color="info" checked={rememberMe} onChange={handleSetRememberMe} />
+        {/* Remember Me */}
+        <VuiBox mb={2}>
+          <VuiSwitch checked={rememberMe} onChange={handleSetRememberMe} />
           <VuiTypography
-            variant="caption"
+            component="span"
+            variant="button"
             color="white"
             fontWeight="medium"
-            onClick={handleSetRememberMe}
-            sx={{ cursor: "pointer", userSelect: "none" }}
+            ml={1}
           >
-            &nbsp;&nbsp;&nbsp;&nbsp;Remember me
+            Remember me
           </VuiTypography>
         </VuiBox>
 
-        {/* Sign Up Button */}
-        <VuiBox mt={4} mb={1}>
-          <VuiButton color="info" fullWidth type="submit">
-            SIGN UP
+        {/* Submit Button */}
+        <VuiBox mb={2}>
+          <VuiButton type="submit" variant="gradient" color="info" fullWidth>
+            Sign Up
           </VuiButton>
+        </VuiBox>
+
+        <VuiBox mt={3} textAlign="center">
+          <VuiTypography variant="button" color="white">
+            Already have an account?{" "}
+            <Link to="/authentication/sign-in">
+              <VuiTypography
+                variant="button"
+                color="info"
+                fontWeight="medium"
+              >
+                Sign In
+              </VuiTypography>
+            </Link>
+          </VuiTypography>
         </VuiBox>
       </VuiBox>
     </CoverLayout>

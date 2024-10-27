@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useHistory } from "react-router-dom";
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
@@ -12,12 +12,12 @@ import borders from "assets/theme/base/borders";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 import bgSignIn from "assets/images/signUpImage.png";
 import axios from "axios";
+import { gsap } from "gsap";
 
 function VolunteerSignUp() {
   const [rememberMe, setRememberMe] = useState(true);
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
-  // State for the form fields
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -33,6 +33,9 @@ function VolunteerSignUp() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
+  
+  // Create refs for input fields
+  const inputRefs = useRef([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,9 +72,7 @@ function VolunteerSignUp() {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/volunteer/signup`, formData);
       console.log("Signup successful:", response.data);
-      // Assuming the API returns user data
       localStorage.setItem("user", JSON.stringify(response.data.user));
-      // Redirect to profile page
       history.push("/profile");
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred during signup. Please try again.");
@@ -80,6 +81,27 @@ function VolunteerSignUp() {
     }
   };
 
+  useEffect(() => {
+    // Animate input fields on mount with reduced delay and duration
+    gsap.from(inputRefs.current, {
+      opacity: 0,
+      y: 50,
+      stagger: 0.1,
+      duration: 0.3, // Reduced duration
+      delay: 0, // No delay before starting the animation
+      ease: "power3.out",
+    });
+  
+    // Optional: If you want to animate the background image too
+    gsap.from(".cover-image", {
+      opacity: 0,
+      scale: 1.1,
+      duration: 0.5,
+      ease: "power3.out",
+      delay: 0.2, // Slightly after input fields
+    });
+  }, []);
+
   return (
     <CoverLayout
       title="Welcome, Volunteer!"
@@ -87,149 +109,37 @@ function VolunteerSignUp() {
       image={bgSignIn}
     >
       <VuiBox component="form" role="form" onSubmit={handleSubmit}>
-        
-        {/* Name */}
-        <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
-            <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
-              Full Name
-            </VuiTypography>
+        {['name', 'email', 'password', 'phone_number', 'skills', 'profile_urls', 'bio'].map((field, index) => (
+          <VuiBox mb={2} key={field} ref={el => inputRefs.current[index] = el}>
+            <VuiBox mb={1} ml={0.5}>
+              <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
+                {field.charAt(0).toUpperCase() + field.slice(1).replace(/_/g, ' ')}
+              </VuiTypography>
+            </VuiBox>
+            <GradientBorder
+              minWidth="100%"
+              padding="1px"
+              borderRadius={borders.borderRadius.lg}
+              backgroundImage={radialGradient(
+                palette.gradients.borderLight.main,
+                palette.gradients.borderLight.state,
+                palette.gradients.borderLight.angle
+              )}
+            >
+              <VuiInput
+                type={field === 'password' ? 'password' : (field === 'email' ? 'email' : 'text')}
+                name={field}
+                placeholder={`Your ${field.replace(/_/g, ' ')}...`}
+                value={formData[field]}
+                onChange={field === 'skills' ? handleSkillsChange : handleChange}
+                fontWeight="500"
+              />
+            </GradientBorder>
           </VuiBox>
-          <GradientBorder
-            minWidth="100%"
-            padding="1px"
-            borderRadius={borders.borderRadius.lg}
-            backgroundImage={radialGradient(
-              palette.gradients.borderLight.main,
-              palette.gradients.borderLight.state,
-              palette.gradients.borderLight.angle
-            )}
-          >
-            <VuiInput
-              type="text"
-              name="name"
-              placeholder="Your full name..."
-              value={formData.name}
-              onChange={handleChange}
-              fontWeight="500"
-            />
-          </GradientBorder>
-        </VuiBox>
-
-        {/* Email */}
-        <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
-            <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
-              Email
-            </VuiTypography>
-          </VuiBox>
-          <GradientBorder
-            minWidth="100%"
-            padding="1px"
-            borderRadius={borders.borderRadius.lg}
-            backgroundImage={radialGradient(
-              palette.gradients.borderLight.main,
-              palette.gradients.borderLight.state,
-              palette.gradients.borderLight.angle
-            )}
-          >
-            <VuiInput
-              type="email"
-              name="email"
-              placeholder="Your email address..."
-              value={formData.email}
-              onChange={handleChange}
-              fontWeight="500"
-            />
-          </GradientBorder>
-        </VuiBox>
-
-        {/* Password */}
-        <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
-            <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
-              Password
-            </VuiTypography>
-          </VuiBox>
-          <GradientBorder
-            minWidth="100%"
-            padding="1px"
-            borderRadius={borders.borderRadius.lg}
-            backgroundImage={radialGradient(
-              palette.gradients.borderLight.main,
-              palette.gradients.borderLight.state,
-              palette.gradients.borderLight.angle
-            )}
-          >
-            <VuiInput
-              type="password"
-              name="password"
-              placeholder="Your password..."
-              value={formData.password}
-              onChange={handleChange}
-              fontWeight="500"
-            />
-          </GradientBorder>
-        </VuiBox>
-
-        {/* Phone */}
-        <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
-            <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
-              Phone
-            </VuiTypography>
-          </VuiBox>
-          <GradientBorder
-            minWidth="100%"
-            padding="1px"
-            borderRadius={borders.borderRadius.lg}
-            backgroundImage={radialGradient(
-              palette.gradients.borderLight.main,
-              palette.gradients.borderLight.state,
-              palette.gradients.borderLight.angle
-            )}
-          >
-            <VuiInput
-              type="tel"
-              name="phone_number"
-              placeholder="Your phone number..."
-              value={formData.phone_number}
-              onChange={handleChange}
-              fontWeight="500"
-            />
-          </GradientBorder>
-        </VuiBox>
-
-        {/* Skills */}
-        <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
-            <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
-              Skills
-            </VuiTypography>
-          </VuiBox>
-          <GradientBorder
-            minWidth="100%"
-            padding="1px"
-            borderRadius={borders.borderRadius.lg}
-            backgroundImage={radialGradient(
-              palette.gradients.borderLight.main,
-              palette.gradients.borderLight.state,
-              palette.gradients.borderLight.angle
-            )}
-          >
-            <VuiInput
-              type="text"
-              name="skills"
-              placeholder="Your skills (comma-separated)..."
-              value={formData.skills.join(', ')}
-              onChange={handleSkillsChange}
-              fontWeight="500"
-            />
-          </GradientBorder>
-        </VuiBox>
+        ))}
 
         {/* Availability */}
-        <VuiBox mb={2}>
+        <VuiBox mb={2} ref={el => inputRefs.current[6] = el}>
           <VuiBox mb={1} ml={0.5}>
             <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
               Availability
@@ -270,64 +180,8 @@ function VolunteerSignUp() {
           ))}
         </VuiBox>
 
-        {/* Profile URLs */}
-        <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
-            <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
-              Profile URLs
-            </VuiTypography>
-          </VuiBox>
-          <GradientBorder
-            minWidth="100%"
-            padding="1px"
-            borderRadius={borders.borderRadius.lg}
-            backgroundImage={radialGradient(
-              palette.gradients.borderLight.main,
-              palette.gradients.borderLight.state,
-              palette.gradients.borderLight.angle
-            )}
-          >
-            <VuiInput
-              type="text"
-              name="profile_urls"
-              placeholder="Platform:URL (comma-separated pairs)..."
-              value={Object.entries(formData.profile_urls).map(([k, v]) => `${k}:${v}`).join(', ')}
-              onChange={handleProfileUrlsChange}
-              fontWeight="500"
-            />
-          </GradientBorder>
-        </VuiBox>
-
-        {/* Bio */}
-        <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
-            <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
-              Bio
-            </VuiTypography>
-          </VuiBox>
-          <GradientBorder
-            minWidth="100%"
-            padding="1px"
-            borderRadius={borders.borderRadius.lg}
-            backgroundImage={radialGradient(
-              palette.gradients.borderLight.main,
-              palette.gradients.borderLight.state,
-              palette.gradients.borderLight.angle
-            )}
-          >
-            <VuiInput
-              type="text"
-              name="bio"
-              placeholder="Your bio..."
-              value={formData.bio}
-              onChange={handleChange}
-              fontWeight="500"
-            />
-          </GradientBorder>
-        </VuiBox>
-
         {/* Remember Me Switch */}
-        <VuiBox display="flex" alignItems="center">
+        <VuiBox display="flex" alignItems="center" ref={el => inputRefs.current[7] = el}>
           <VuiSwitch color="info" checked={rememberMe} onChange={handleSetRememberMe} />
           <VuiTypography
             variant="caption"
