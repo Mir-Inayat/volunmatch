@@ -38,17 +38,56 @@ def get_recommendations():
         return jsonify({"error": "Unable to generate recommendations", "details": str(e)}), 500
 
 @bp.route('/api/profile', methods=['GET'])
-@login_required
-def get_profile():
-    if current_user.role == 'volunteer':
-        user = Volunteer.query.get(current_user.id)
-    elif current_user.role == 'organization':
-        user = Organization.query.get(current_user.id)
-    else:
-        return jsonify({"error": "Invalid user role"}), 400
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-    return jsonify(user.to_dict())
+def profile():
+    # Hardcoded user data for a volunteer
+    user_data = {
+        "user": {
+            "id": 1,
+            "email": "volunteer@example.com",
+            "name": "John Doe",
+            "phone_number": "+1234567890",
+            "profile_picture": "http://example.com/profile.jpg",
+            "created_at": "2024-10-27T02:52:20",
+            "skills": ["coding", "design", "communication"],
+            "availability": {
+                "monday": {"morning": True, "afternoon": False, "evening": True},
+                "tuesday": {"morning": False, "afternoon": True, "evening": False},
+                # Add other days as needed
+            },
+            "profile_urls": {
+                "linkedin": "https://www.linkedin.com/in/johndoe",
+                "github": "https://github.com/johndoe"
+            },
+            "bio": "I'm a passionate volunteer with experience in...",
+            "rating": 4.5
+        }
+    }
+
+    return jsonify(user_data), 200
+
+@bp.route('/api/billing', methods=['GET'])
+def billing():
+    # Hardcoded user data for an organization
+    user_data = {
+        "user": {
+            "id": 1,
+            "email": "org@example.com",
+            "org_name": "Example Nonprofit",
+            "org_url": "https://www.examplenonprofit.org",
+            "description": "We are dedicated to...",
+            "profile_urls": {
+                "facebook": "https://www.facebook.com/examplenonprofit",
+                "twitter": "https://twitter.com/examplenonprofit"
+            },
+            "contact_name": "Jane Smith",
+            "contact_email": "contact@examplenonprofit.org",
+            "org_type": "Environmental",
+            "cause_categories": ["Conservation", "Education"],
+            "created_at": "2024-10-27T02:52:20"
+        }
+    }
+
+    return jsonify(user_data), 200
 
 @bp.route('/api/opportunities', methods=['GET'])
 def get_opportunities():
@@ -81,9 +120,13 @@ def create_opportunity():
         start_date=data.get('start_date'),
         end_date=data.get('end_date')
     )
-    db.session.add(new_opportunity)
-    db.session.commit()
-    return jsonify(new_opportunity.to_dict()), 201
+    try:
+        db.session.add(new_opportunity)
+        db.session.commit()
+        return jsonify(new_opportunity.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred while creating the opportunity", "details": str(e)}), 500
 
 @bp.route('/api/volunteer_rating', methods=['POST'])
 @login_required
@@ -122,3 +165,4 @@ def update_volunteer_rating():
     return jsonify({"message": "Volunteer rating updated successfully"}), 200
 
 # Add more routes as needed
+# This route is no longer required and has been removed.

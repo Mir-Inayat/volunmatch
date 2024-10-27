@@ -1,38 +1,28 @@
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
 import burceMars from "assets/images/avatar-simmmple.png";
-import breakpoints from "assets/theme/base/breakpoints";
 import VuiAvatar from "components/VuiAvatar";
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
-import { useEffect, useState } from "react";
 
-function Header() {
-  const [userData, setUserData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    skills: "",
-    availability: "",
-    preferences: "",
-    socialMedia: "",
-    profileURL: "",
-  });
+function Header({ name, email, skills, phone, availability }) {
+  const formatSkills = (skills) => {
+    if (Array.isArray(skills)) {
+      return skills.join(', ');
+    } else if (typeof skills === 'string') {
+      return skills;
+    }
+    return 'coding, design, communication';
+  };
 
-  useEffect(() => {
-    // Retrieve user data from local storage
-    const storedUserData = {
-      fullName: localStorage.getItem("fullName"),
-      email: localStorage.getItem("email"),
-      phone: localStorage.getItem("phone"),
-      skills: localStorage.getItem("skills"),
-      availability: localStorage.getItem("availability"),
-      preferences: localStorage.getItem("preferences"),
-      socialMedia: localStorage.getItem("socialMedia"),
-      profileURL: localStorage.getItem("profileURL"),
-    };
-    setUserData(storedUserData);
-  }, []);
+  const formatAvailability = (availability) => {
+    if (typeof availability === 'object' && availability !== null) {
+      return JSON.stringify(availability);
+    } else if (typeof availability === 'string') {
+      return availability;
+    }
+    return 'monday:afternoon: Not Available evening: Available morning: Available tuesday:afternoon: Available evening: Not Available morning: Not Available';
+  };
 
   return (
     <VuiBox position="relative">
@@ -95,30 +85,29 @@ function Header() {
                 },
               })}
             >
-              <VuiTypography variant="lg" color="white" fontWeight="bold">
-                Nice to see you, {userData.fullName}!
-              </VuiTypography>
-              <VuiTypography variant="button" color="text" fontWeight="regular">
-                {userData.email}
-              </VuiTypography>
-              <VuiTypography variant="button" color="text" fontWeight="regular">
-                Skills: {userData.skills}
-              </VuiTypography>
-              <VuiTypography variant="button" color="text" fontWeight="regular">
-                Phone: {userData.phone}
-              </VuiTypography>
-              <VuiTypography variant="button" color="text" fontWeight="regular">
-                Availability: {userData.availability}
-              </VuiTypography>
-              <VuiTypography variant="button" color="text" fontWeight="regular">
-                Preferences: {userData.preferences}
-              </VuiTypography>
-              <VuiTypography variant="button" color="text" fontWeight="regular">
-                Social Media Links: {userData.socialMedia}
-              </VuiTypography>
-              <VuiTypography variant="button" color="text" fontWeight="regular">
-                Profile URL: {userData.profileURL}
-              </VuiTypography>
+              {name ? (
+                <>
+                  <VuiTypography variant="lg" color="white" fontWeight="bold">
+                    Nice to see you, {name}!
+                  </VuiTypography>
+                  <VuiTypography variant="button" color="text" fontWeight="regular">
+                    {email || 'user@example.com'}
+                  </VuiTypography>
+                  <VuiTypography variant="button" color="text" fontWeight="regular">
+                    Skills: {formatSkills(skills)}
+                  </VuiTypography>
+                  <VuiTypography variant="button" color="text" fontWeight="regular">
+                    Phone: {phone || '+1234567890'}
+                  </VuiTypography>
+                  <VuiTypography variant="button" color="text" fontWeight="regular">
+                    Availability: {formatAvailability(availability)}
+                  </VuiTypography>
+                </>
+              ) : (
+                <VuiTypography variant="lg" color="white" fontWeight="bold">
+                  Loading user data...
+                </VuiTypography>
+              )}
             </VuiBox>
           </Grid>
         </Grid>

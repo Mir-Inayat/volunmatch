@@ -17,9 +17,8 @@
 */
 
 import { useState } from "react";
-
-// react-router-dom components
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
 
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
@@ -43,8 +42,33 @@ import bgSignIn from "assets/images/signInImage.png";
 
 function SignIn() {
   const [rememberMe, setRememberMe] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const history = useHistory();
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/login/volunteer`, {
+        email,
+        password
+      });
+
+      // Handle successful login
+      console.log("Login successful:", response.data);
+      // Store the user data or token in local storage or context
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      // Redirect to the dashboard or home page
+      history.push("/profile");
+    } catch (err) {
+      setError(err.response?.data?.message || "An error occurred during login");
+    }
+  };
 
   return (
     <CoverLayout
@@ -55,7 +79,7 @@ function SignIn() {
       motto="THE VISION UI DASHBOARD"
       image={bgSignIn}
     >
-      <VuiBox component="form" role="form">
+      <VuiBox component="form" role="form" onSubmit={handleSubmit}>
         <VuiBox mb={2}>
           <VuiBox mb={1} ml={0.5}>
             <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
@@ -72,7 +96,13 @@ function SignIn() {
               palette.gradients.borderLight.angle
             )}
           >
-            <VuiInput type="email" placeholder="Your email..." fontWeight="500" />
+            <VuiInput 
+              type="email" 
+              placeholder="Your email..." 
+              fontWeight="500" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </GradientBorder>
         </VuiBox>
         <VuiBox mb={2}>
@@ -94,6 +124,8 @@ function SignIn() {
             <VuiInput
               type="password"
               placeholder="Your password..."
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               sx={({ typography: { size } }) => ({
                 fontSize: size.sm,
               })}
@@ -112,8 +144,15 @@ function SignIn() {
             &nbsp;&nbsp;&nbsp;&nbsp;Remember me
           </VuiTypography>
         </VuiBox>
+        {error && (
+          <VuiBox mt={2}>
+            <VuiTypography variant="caption" color="error" fontWeight="medium">
+              {error}
+            </VuiTypography>
+          </VuiBox>
+        )}
         <VuiBox mt={4} mb={1}>
-          <VuiButton color="info" fullWidth>
+          <VuiButton type="submit" color="info" fullWidth>
             SIGN IN
           </VuiButton>
         </VuiBox>

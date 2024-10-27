@@ -3,29 +3,61 @@ from flask_login import login_user, logout_user, login_required
 from app.models.volunteer import Volunteer
 from app.models.organization import Organization
 from app import db
+from sqlalchemy.exc import IntegrityError
 
 auth = Blueprint('auth', __name__)
 
 @auth.route('/api/login/volunteer', methods=['POST'])
 def volunteer_login():
-    data = request.json
-    volunteer = Volunteer.query.filter_by(email=data.get('email')).first()
-    if volunteer and volunteer.check_password(data.get('password')):
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No input data provided"}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+
+    # Validate required fields
+    if not email or not password:
+        return jsonify({"message": "Email and password are required"}), 400
+
+    # Retrieve the volunteer by email
+    volunteer = Volunteer.query.filter_by(email=email).first()
+    if volunteer and volunteer.check_password(password):
         login_user(volunteer)
-        return jsonify({"message": "Volunteer logged in successfully", "user": volunteer.to_dict()}), 200
-    return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({
+            "message": "Volunteer logged in successfully",
+            "user": volunteer.to_dict()
+        }), 200
+
+    return jsonify({"message": "Invalid email or password"}), 401
+
 
 @auth.route('/api/login/organization', methods=['POST'])
 def organization_login():
-    data = request.json
-    organization = Organization.query.filter_by(email=data.get('email')).first()
-    if organization and organization.check_password(data.get('password')):
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No input data provided"}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+
+    # Validate required fields
+    if not email or not password:
+        return jsonify({"message": "Email and password are required"}), 400
+
+    # Retrieve the organization by email
+    organization = Organization.query.filter_by(email=email).first()
+    if organization and organization.check_password(password):
         login_user(organization)
-        return jsonify({"message": "Organization logged in successfully", "user": organization.to_dict()}), 200
-    return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({
+            "message": "Organization logged in successfully",
+            "user": organization.to_dict()
+        }), 200
+
+    return jsonify({"message": "Invalid email or password"}), 401
+
 
 @auth.route('/api/logout', methods=['POST'])
-@login_required
 def logout():
     logout_user()
     return jsonify({"message": "Logged out successfully"}), 200
