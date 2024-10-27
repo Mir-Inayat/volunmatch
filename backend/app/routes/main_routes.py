@@ -179,3 +179,17 @@ def update_volunteer_rating():
 
 # Add more routes as needed
 # This route is no longer required and has been removed.
+@bp.route('/api/ngos', methods=['GET'])
+def get_all_ngos():
+    try:
+        # Query all organizations from the database
+        organizations = Organization.query.all()
+        
+        # Convert the organizations to a list of dictionaries
+        ngos_list = [org.to_dict() for org in organizations]
+        
+        # Return the list of organizations as JSON
+        return jsonify({"ngos": ngos_list}), 200
+    except Exception as e:
+        # If an error occurs, return an error message
+        return jsonify({"error": "An error occurred while fetching NGOs", "details": str(e)}), 500
