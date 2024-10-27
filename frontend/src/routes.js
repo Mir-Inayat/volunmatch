@@ -39,9 +39,11 @@
 */
 
 // Vision UI Dashboard React layouts
+import Donations from "layouts/donations";
 import Dashboard from "layouts/dashboard";
 import ProjectsDashboard from "layouts/projects";
 import orgprofile from "layouts/orgprofile";
+
 import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
@@ -168,6 +170,15 @@ const routes = [
     component: LandingPage,
     noCollapse: true,
     isHidden: true
+  },
+  {
+    type :"collapse",
+    name: "Donations",
+    key: "donations",
+    route: "/donations",
+    icon: <IoRocketSharp size="15px" color="inherit" />,
+    component: Donations,
+    noCollapse: true,
   }
   
 ];
