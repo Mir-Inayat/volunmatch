@@ -6,7 +6,7 @@ import Footer from "examples/Footer";
 
 // New components for organization profile
 import OrgInfo from "./components/Bill";
-import ContactDetails from "./components/BillingInformation";
+import ContactDetails from "./components/orgprofileInformation";
 import CauseCategories from "./components/CreditBalance";
 import SocialLinks from "./components/Invoice";
 

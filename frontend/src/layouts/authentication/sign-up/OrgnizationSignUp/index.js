@@ -61,7 +61,7 @@ function OrganizationSignUp() {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/organization/signup`, formData);
       console.log('Signup successful:', response.data);
       // Redirect to the profile page after successful signup
-      history.push('/billing');
+      history.push('/orgprofile');
     } catch (error) {
       console.error('Signup error:', error);
       // Handle error (e.g., show error message to user)

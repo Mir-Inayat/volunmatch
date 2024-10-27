@@ -1,25 +1,7 @@
-/*!
-
-=========================================================
-* Vision UI Free React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-react/blob/master LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-import { useState } from "react";
-
-// react-router-dom components
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
+import { gsap } from "gsap";
 
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
@@ -33,12 +15,41 @@ import palette from "assets/theme/base/colors";
 import borders from "assets/theme/base/borders";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 import bgSignIn from "assets/images/signInImage.png";
-import { gsap } from "gsap";
 
 function SignIn() {
   const [rememberMe, setRememberMe] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const history = useHistory();
+
+  const titleRef = useRef();
+  const formRef = useRef();
+  const buttonRef = useRef();
+
+  useEffect(() => {
+    // GSAP animations
+    gsap.from(titleRef.current, { opacity: 0, y: -50, duration: 1 });
+    gsap.from(formRef.current, { opacity: 0, x: -50, duration: 1, delay: 0.5 });
+    gsap.from(buttonRef.current, { opacity: 0, y: 50, duration: 1, delay: 1 });
+  }, []);
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/login/volunteer`, {
+        email,
+        password
+      });
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      history.push("/profile");
+    } catch (err) {
+      setError(err.response?.data?.message || "An error occurred during login");
+    }
+  };
 
   return (
     <CoverLayout
@@ -46,12 +57,12 @@ function SignIn() {
       color="white"
       description="Enter your email and password to sign in"
       premotto="INSPIRED BY THE FUTURE:"
-      motto="THE Vision ui DASHBOARD"
+      motto="THE VISION UI DASHBOARD"
       image={bgSignIn}
     >
-      <VuiBox component="form" role="form">
+      <VuiBox ref={formRef} component="form" role="form" onSubmit={handleSubmit}>
         <VuiBox mb={2}>
-          <VuiBox mb={1} ml={0.5}>
+          <VuiBox mb={1} ml={0.5} ref={titleRef}>
             <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
               Email
             </VuiTypography>
@@ -76,7 +87,7 @@ function SignIn() {
           </GradientBorder>
         </VuiBox>
         
-        <VuiBox mb={2} ref={passwordRef}>
+        <VuiBox mb={2}>
           <VuiBox mb={1} ml={0.5}>
             <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
               Password
@@ -116,8 +127,17 @@ function SignIn() {
             &nbsp;&nbsp;&nbsp;&nbsp;Remember me
           </VuiTypography>
         </VuiBox>
-        <VuiBox mt={4} mb={1}>
-          <VuiButton color="info" fullWidth>
+        
+        {error && (
+          <VuiBox mt={2}>
+            <VuiTypography variant="caption" color="error" fontWeight="medium">
+              {error}
+            </VuiTypography>
+          </VuiBox>
+        )}
+        
+        <VuiBox mt={4} mb={1} ref={buttonRef}>
+          <VuiButton type="submit" color="info" fullWidth>
             SIGN IN
           </VuiButton>
         </VuiBox>

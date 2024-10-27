@@ -39,8 +39,8 @@ function BasicLayout({ title, description, image, children }) {
       <DefaultNavbar
         action={{
           type: "external",
-          route: "https://creative-tim.com/product/vision-ui-dashboard-react",
-          label: "Free Download",
+          route: "https://github.com/Mir-Inayat/volunmatch",
+          label: "Open Source Download",
         }}
         transparent
         light

@@ -1,23 +1,7 @@
-/*!
-
-=========================================================
-* Vision UI Free React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-react/blob/master/LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-*/
-
-import { useState } from "react";
-
-// react-router-dom components
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link, useHistory } from "react-router-dom";
+import axios from "axios";
+import { gsap } from "gsap";
 
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
@@ -31,12 +15,44 @@ import palette from "assets/theme/base/colors";
 import borders from "assets/theme/base/borders";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
 import bgSignIn from "assets/images/signInImage.png";
-import { gsap } from "gsap";
 
 function OrganizationSignIn() {
   const [rememberMe, setRememberMe] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const history = useHistory();
+  const formRef = useRef();
+  const titleRef = useRef();
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/login/organization`, {
+        email,
+        password
+      });
+      localStorage.setItem("organization", JSON.stringify(response.data.user));
+      history.push("/orgprofile");
+    } catch (err) {
+      setError(err.response?.data?.message || "An error occurred during login");
+    }
+  };
+
+  useEffect(() => {
+    // Animations for title and form fields
+    gsap.from(titleRef.current, { opacity: 0, y: -50, duration: 1, ease: "power3.out" });
+    gsap.from(formRef.current.children, {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      ease: "power3.out",
+      stagger: 0.2,
+    });
+  }, []);
 
   return (
     <CoverLayout
@@ -47,7 +63,12 @@ function OrganizationSignIn() {
       motto="THE VISION UI DASHBOARD"
       image={bgSignIn}
     >
-      <VuiBox component="form" role="form">
+      <div ref={titleRef}>
+        <VuiTypography variant="h4" color="white" fontWeight="bold" textAlign="center" mt={3}>
+          Organization Sign-In
+        </VuiTypography>
+      </div>
+      <VuiBox component="form" role="form" onSubmit={handleSubmit} ref={formRef}>
         <VuiBox mb={2}>
           <VuiBox mb={1} ml={0.5}>
             <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
@@ -73,8 +94,7 @@ function OrganizationSignIn() {
             />
           </GradientBorder>
         </VuiBox>
-        
-        <VuiBox mb={2} ref={passwordRef}>
+        <VuiBox mb={2}>
           <VuiBox mb={1} ml={0.5}>
             <VuiTypography component="label" variant="button" color="white" fontWeight="medium">
               Password
@@ -101,7 +121,6 @@ function OrganizationSignIn() {
             />
           </GradientBorder>
         </VuiBox>
-
         <VuiBox display="flex" alignItems="center">
           <VuiSwitch color="info" checked={rememberMe} onChange={handleSetRememberMe} />
           <VuiTypography
@@ -114,12 +133,18 @@ function OrganizationSignIn() {
             &nbsp;&nbsp;&nbsp;&nbsp;Remember me
           </VuiTypography>
         </VuiBox>
+        {error && (
+          <VuiBox mt={2}>
+            <VuiTypography variant="caption" color="error" fontWeight="medium">
+              {error}
+            </VuiTypography>
+          </VuiBox>
+        )}
         <VuiBox mt={4} mb={1}>
-          <VuiButton color="info" fullWidth>
+          <VuiButton type="submit" color="info" fullWidth>
             SIGN IN
           </VuiButton>
         </VuiBox>
-
         <VuiBox mt={3} textAlign="center">
           <VuiTypography variant="button" color="text" fontWeight="regular">
             Don&apos;t have an account?{" "}

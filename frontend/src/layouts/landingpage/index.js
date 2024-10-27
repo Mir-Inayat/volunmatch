@@ -86,7 +86,7 @@ function LandingPage() {
       {/* Buttons with animation ref */}
       <VuiBox mt={3} ref={buttonsRef}>
         <Button variant="contained" color="info" href="/authentication/sign-in">
-          Get Started
+          Sign In
         </Button>
         <Button variant="outlined" color="info" href="/authentication/sign-up" sx={{ ml: 2 }}>
           Sign Up
@@ -95,6 +95,9 @@ function LandingPage() {
 
       {/* About Us section with animation ref */}
       <VuiBox mb={5} textAlign="center" ref={aboutRef}>
+        <VuiTypography variant="h4" fontWeight="medium" color="white">
+          ------------------------
+        </VuiTypography>
         <VuiTypography variant="h4" fontWeight="medium" color="white">
           About Us
         </VuiTypography>

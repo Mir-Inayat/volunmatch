@@ -65,8 +65,8 @@ def profile():
 
     return jsonify(user_data), 200
 
-@bp.route('/api/billing', methods=['GET'])
-def billing():
+@bp.route('/api/orgprofile', methods=['GET'])
+def orgprofile():
     # Hardcoded user data for an organization
     user_data = {
         "user": {

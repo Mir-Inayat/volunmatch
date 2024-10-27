@@ -41,7 +41,7 @@
 // Vision UI Dashboard React layouts
 import Dashboard from "layouts/dashboard";
 import ProjectsDashboard from "layouts/projects";
-import Billing from "layouts/billing";
+import OrgProfile from "layouts/orgprofile";
 import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
@@ -82,11 +82,11 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
-    route: "/billing",
+    name: "Organization Profile",
+    key: "orgprofile",
+    route: "/orgprofile",
     icon: <BsCreditCardFill size="15px" color="inherit" />,
-    component: Billing,
+    component: OrgProfile,
     noCollapse: true,
   },
   {

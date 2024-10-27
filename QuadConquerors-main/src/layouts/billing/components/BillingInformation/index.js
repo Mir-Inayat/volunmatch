@@ -24,14 +24,14 @@ import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
 
 // Billing page components
-import Bill from "layouts/billing/components/Bill";
+import Bill from "layouts/orgprofile/components/Bill";
 
-function BillingInformation() {
+function orgprofileInformation() {
   return (
     <Card id="delete-account">
       <VuiBox>
         <VuiTypography variant="lg" color="white" fontWeight="bold">
-          Billing Information
+          Organization Profile Information
         </VuiTypography>
       </VuiBox>
       <VuiBox>
@@ -61,4 +61,4 @@ function BillingInformation() {
   );
 }
 
-export default BillingInformation;
+export default orgprofileInformation;

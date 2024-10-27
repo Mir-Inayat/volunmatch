@@ -30,13 +30,13 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
 // Billing page components
-import PaymentMethod from "layouts/billing/components/PaymentMethod";
-import Invoices from "layouts/billing/components/Invoices";
-import BillingInformation from "layouts/billing/components/BillingInformation";
-import Transactions from "layouts/billing/components/Transactions";
+import PaymentMethod from "layouts/orgprofile/components/PaymentMethod";
+import Invoices from "layouts/orgprofile/components/Invoices";
+import orgprofileInformation from "layouts/orgprofile/components/orgprofileInformation";
+import Transactions from "layouts/orgprofile/components/Transactions";
 import CreditBalance from "./components/CreditBalance";
 
-function Billing() {
+function OrgProfile() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -64,7 +64,7 @@ function Billing() {
         <VuiBox my={3}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={7}>
-              <BillingInformation />
+              <orgprofileInformation />
             </Grid>
             <Grid item xs={12} md={5}>
               <Transactions />
@@ -77,4 +77,4 @@ function Billing() {
   );
 }
 
-export default Billing;
+export default OrgProfile;

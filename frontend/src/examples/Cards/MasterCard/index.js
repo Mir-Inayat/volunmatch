@@ -19,7 +19,7 @@
 // prop-types is a library for typechecking of props
 // @mui material components
 import Card from "@mui/material/Card";
-import billingCard from "assets/images/billing-background-card.png";
+import orgprofileCard from "assets/images/orgprofile-background-card.png";
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
@@ -41,7 +41,7 @@ function MasterCard({ number, valid, cvv }) {
   const num4 = numbers.slice(12, 16).join("");
 
   return (
-    <Card sx={{ background: `url('${billingCard}')`, backdropfilter: "blur(31px)" }}>
+    <Card sx={{ background: `url('${orgprofileCard}')`, backdropfilter: "blur(31px)" }}>
       <VuiBox p={2} pt={0}>
         <VuiBox
           color="white"

@@ -41,7 +41,7 @@
 // Vision UI Dashboard React layouts
 import Dashboard from "layouts/dashboard";
 import ProjectsDashboard from "layouts/projects";
-import Billing from "layouts/billing";
+import orgprofile from "layouts/orgprofile";
 import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
@@ -62,31 +62,33 @@ import OrganizationSignIn from "layouts/authentication/sign-in/OrganizationSignI
 import OrganizationSignUp from "layouts/authentication/sign-up/OrgnizationSignUp";
 
 const routes = [
+  // {
+  //   type: "collapse",
+  //   name: "Dashboard",
+  //   key: "dashboard",
+  //   route: "/dashboard",
+  //   icon: <IoHome size="15px" color="inherit" />,
+  //   component: Dashboard,
+  //   noCollapse: true,
+  // },
+  // This route defines the Dashboard page
+  // It uses the Dashboard component and displays a home icon in the navigation
+  // {
+  //   type: "collapse",
+  //   name: "ProjectsDashboard",
+  //   key: "projectsdashboard",
+  //   route: "/projects",
+  //   icon: <IoStatsChart size="15px" color="inherit" />,
+  //   component: ProjectsDashboard,
+  //   noCollapse: true,
+  // },
   {
     type: "collapse",
-    name: "Dashboard",
-    key: "dashboard",
-    route: "/dashboard",
-    icon: <IoHome size="15px" color="inherit" />,
-    component: Dashboard,
-    noCollapse: true,
-  },
-  {
-    type: "collapse",
-    name: "ProjectsDashboard",
-    key: "projectsdashboard",
-    route: "/projects",
-    icon: <IoStatsChart size="15px" color="inherit" />,
-    component: ProjectsDashboard,
-    noCollapse: true,
-  },
-  {
-    type: "collapse",
-    name: "Billing",
-    key: "billing",
-    route: "/billing",
+    name: "Organization Profile",
+    key: "orgprofile",
+    route: "/orgprofile",
     icon: <BsCreditCardFill size="15px" color="inherit" />,
-    component: Billing,
+    component: orgprofile,
     noCollapse: true,
   },
   { type: "title", title: "Account Pages", key: "account-pages" },
