@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from app.models.User import User
+# Removed the User import since it's no longer used
+# from app.models.User import User  
 from app.models.volunteer import Volunteer
 from app.models.organization import Organization
 from app.models.opportunity import Opportunity
@@ -41,8 +42,12 @@ def get_recommendations():
 def get_profile():
     if current_user.role == 'volunteer':
         user = Volunteer.query.get(current_user.id)
-    else:
+    elif current_user.role == 'organization':
         user = Organization.query.get(current_user.id)
+    else:
+        return jsonify({"error": "Invalid user role"}), 400
+    if not user:
+        return jsonify({"error": "User not found"}), 404
     return jsonify(user.to_dict())
 
 @bp.route('/api/opportunities', methods=['GET'])
@@ -57,6 +62,12 @@ def create_opportunity():
         return jsonify({"error": "Only organizations can create opportunities"}), 403
     
     data = request.json
+    # Validate required fields
+    required_fields = ['title', 'description']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"'{field}' is a required field"}), 400
+
     new_opportunity = Opportunity(
         organization_id=current_user.id,
         title=data['title'],
@@ -81,18 +92,32 @@ def update_volunteer_rating():
         return jsonify({"error": "Only organizations can rate volunteers"}), 403
 
     data = request.json
+    # Validate required fields
+    required_fields = ['match_id', 'rating']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"'{field}' is a required field"}), 400
+
     volunteer_match = VolunteerMatch.query.get(data['match_id'])
     
     if not volunteer_match:
         return jsonify({"error": "Volunteer match not found"}), 404
 
+    # Ensure the organization owns the opportunity related to this match
+    if volunteer_match.opportunity.organization_id != current_user.id:
+        return jsonify({"error": "You do not have permission to rate this volunteer"}), 403
+
+    # Update ratings and reviews
     volunteer_match.volunteer_rating = data['rating']
     volunteer_match.organization_review = data.get('review', '')
     db.session.commit()
 
     # Update the volunteer's average rating
     volunteer = Volunteer.query.get(volunteer_match.volunteer_id)
-    volunteer.update_average_rating()
+    if volunteer:
+        volunteer.update_average_rating()
+    else:
+        return jsonify({"error": "Volunteer not found"}), 404
 
     return jsonify({"message": "Volunteer rating updated successfully"}), 200
 

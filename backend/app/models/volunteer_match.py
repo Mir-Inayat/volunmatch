@@ -1,4 +1,4 @@
-from . import db
+from .. import db
 from datetime import datetime
 from sqlalchemy.orm import relationship
 
@@ -15,7 +15,7 @@ class VolunteerMatch(db.Model):
     organization_rating = db.Column(db.Float)
 
     # Relationships
-    volunteer = relationship("Volunteer", back_populates="ratings_received")
+    volunteer = relationship("Volunteer", back_populates="matches")
     opportunity = relationship("Opportunity", back_populates="matches")
 
     def __repr__(self):

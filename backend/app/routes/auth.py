@@ -1,19 +1,27 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_user, logout_user, login_required
-from app.models.User import User
 from app.models.volunteer import Volunteer
 from app.models.organization import Organization
 from app import db
 
 auth = Blueprint('auth', __name__)
 
-@auth.route('/api/login', methods=['POST'])
-def login():
+@auth.route('/api/login/volunteer', methods=['POST'])
+def volunteer_login():
     data = request.json
-    user = User.query.filter_by(email=data['email']).first()
-    if user and user.check_password(data['password']):
-        login_user(user)
-        return jsonify({"message": "Logged in successfully", "user": user.to_dict()}), 200
+    volunteer = Volunteer.query.filter_by(email=data.get('email')).first()
+    if volunteer and volunteer.check_password(data.get('password')):
+        login_user(volunteer)
+        return jsonify({"message": "Volunteer logged in successfully", "user": volunteer.to_dict()}), 200
+    return jsonify({"message": "Invalid credentials"}), 401
+
+@auth.route('/api/login/organization', methods=['POST'])
+def organization_login():
+    data = request.json
+    organization = Organization.query.filter_by(email=data.get('email')).first()
+    if organization and organization.check_password(data.get('password')):
+        login_user(organization)
+        return jsonify({"message": "Organization logged in successfully", "user": organization.to_dict()}), 200
     return jsonify({"message": "Invalid credentials"}), 401
 
 @auth.route('/api/logout', methods=['POST'])
@@ -22,33 +30,65 @@ def logout():
     logout_user()
     return jsonify({"message": "Logged out successfully"}), 200
 
-@auth.route('/api/register', methods=['POST'])
-def register():
+@auth.route('/api/volunteer/signup', methods=['POST'])
+def volunteer_signup():
     data = request.json
-    if User.query.filter_by(email=data['email']).first():
+    email = data.get('email')
+    if Volunteer.query.filter_by(email=email).first():
         return jsonify({"message": "Email already registered"}), 400
     
-    if data['role'] == 'volunteer':
-        new_user = Volunteer(
-            email=data['email'],
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            # Add other Volunteer-specific fields
-        )
-    elif data['role'] == 'organization':
-        new_user = Organization(
-            email=data['email'],
-            org_name=data['org_name'],
-            # Add other Organization-specific fields
-        )
-    else:
-        return jsonify({"message": "Invalid role"}), 400
+    # Validate required fields
+    required_fields = ['email', 'password', 'name']
+    for field in required_fields:
+        if field not in data or not data.get(field):
+            return jsonify({"message": f"'{field}' is a required field"}), 400
     
-    new_user.set_password(data['password'])
-    db.session.add(new_user)
+    new_volunteer = Volunteer(
+        email=email,
+        name=data['name'],
+        phone_number=data.get('phone_number'),
+        profile_picture=data.get('profile_picture'),
+        skills=data.get('skills', []),
+        availability=data.get('availability', {}),
+        profile_urls=data.get('profile_urls', {}),
+        bio=data.get('bio', '')
+    )
+    
+    new_volunteer.set_password(data['password'])
+    db.session.add(new_volunteer)
     db.session.commit()
     
-    login_user(new_user)
-    return jsonify({"message": "Registered successfully", "user": new_user.to_dict()}), 201
+    login_user(new_volunteer)
+    return jsonify({"message": "Volunteer registered successfully", "user": new_volunteer.to_dict()}), 201
 
-# Add other auth-related routes here (e.g., register, logout)
+@auth.route('/api/organization/signup', methods=['POST'])
+def organization_signup():
+    data = request.json
+    email = data.get('email')
+    if Organization.query.filter_by(email=email).first():
+        return jsonify({"message": "Email already registered"}), 400
+    
+    # Validate required fields
+    required_fields = ['email', 'password', 'org_name']
+    for field in required_fields:
+        if field not in data or not data.get(field):
+            return jsonify({"message": f"'{field}' is a required field"}), 400
+    
+    new_organization = Organization(
+        email=email,
+        org_name=data['org_name'],
+        org_url=data.get('org_url'),
+        description=data.get('description'),
+        profile_urls=data.get('profile_urls', {}),
+        contact_name=data.get('contact_name'),
+        contact_email=data.get('contact_email'),
+        org_type=data.get('org_type'),
+        cause_categories=data.get('cause_categories', [])
+    )
+    
+    new_organization.set_password(data['password'])
+    db.session.add(new_organization)
+    db.session.commit()
+    
+    login_user(new_organization)
+    return jsonify({"message": "Organization registered successfully", "user": new_organization.to_dict()}), 201
