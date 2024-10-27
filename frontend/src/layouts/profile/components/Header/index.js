@@ -38,7 +38,7 @@ import { IoBuild } from "react-icons/io5";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { useEffect, useState } from "react";
 
-function Header() {
+function Header({ name, email }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
 
@@ -63,10 +63,6 @@ function Header() {
   }, [tabsOrientation]);
 
   const handleSetTabValue = (event, newValue) => setTabValue(newValue);
-
-  // Retrieve user's name and email from localStorage
-  const fullName = localStorage.getItem("fullName");
-  const email = localStorage.getItem("email");
 
   return (
     <VuiBox position="relative">
@@ -131,7 +127,7 @@ function Header() {
               })}
             >
               <VuiTypography variant="lg" color="white" fontWeight="bold">
-                {fullName || "N/A"} {/* Default value if not found */}
+                {name || "N/A"} {/* Default value if not found */}
               </VuiTypography>
               <VuiTypography variant="button" color="text" fontWeight="regular">
                 {email || "N/A"} {/* Default value if not found */}
@@ -146,9 +142,8 @@ function Header() {
                 onChange={handleSetTabValue}
                 sx={{ background: "transparent", display: "flex", justifyContent: "flex-end" }}
               >
-                <Tab label="OVERVIEW" icon={<IoCube color="white" size="16px" />} />
-                <Tab label="TEAMS" icon={<IoDocument color="white" size="16px" />} />
-                <Tab label="PROJECTS" icon={<IoBuild color="white" size="16px" />} />
+                <Tab label="OFFLINE" icon={<IoCube color="white" size="16px" />} />
+                <Tab label="ONLINE" icon={<IoDocument color="white" size="16px" />} />
               </Tabs>
             </AppBar>
           </Grid>
@@ -159,4 +154,3 @@ function Header() {
 }
 
 export default Header;
-

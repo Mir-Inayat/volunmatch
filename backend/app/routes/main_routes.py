@@ -39,55 +39,68 @@ def get_recommendations():
 
 @bp.route('/api/profile', methods=['GET'])
 def profile():
-    # Hardcoded user data for a volunteer
-    user_data = {
-        "user": {
-            "id": 1,
-            "email": "volunteer@example.com",
-            "name": "John Doe",
-            "phone_number": "+1234567890",
-            "profile_picture": "http://example.com/profile.jpg",
-            "created_at": "2024-10-27T02:52:20",
-            "skills": ["coding", "design", "communication"],
-            "availability": {
-                "monday": {"morning": True, "afternoon": False, "evening": True},
-                "tuesday": {"morning": False, "afternoon": True, "evening": False},
-                # Add other days as needed
-            },
-            "profile_urls": {
-                "linkedin": "https://www.linkedin.com/in/johndoe",
-                "github": "https://github.com/johndoe"
-            },
-            "bio": "I'm a passionate volunteer with experience in...",
-            "rating": 4.5
-        }
-    }
+    # Query the latest volunteer added to the database
+    latest_volunteer = Volunteer.query.order_by(Volunteer.created_at.desc()).first()
 
-    return jsonify(user_data), 200
+    if latest_volunteer:
+        user_data = latest_volunteer.to_dict()
+        return jsonify({"user": user_data}), 200
+    else:
+        user_data = {
+            "user": {
+                "id": 1,
+                "email": "volunteer@example.com",
+                "name": "John Doe",
+                "phone_number": "+1234567890",
+                "profile_picture": "http://example.com/profile.jpg",
+                "created_at": "2024-10-27T02:52:20",
+                "skills": ["coding", "design", "communication"],
+                "availability": {
+                    "monday": {"morning": True, "afternoon": False, "evening": True},
+                    "tuesday": {"morning": False, "afternoon": True, "evening": False},
+                    # Add other days as needed
+                },
+                "profile_urls": {
+                    "linkedin": "https://www.linkedin.com/in/johndoe",
+                    "github": "https://github.com/johndoe"
+                },
+                "bio": "I'm a passionate volunteer with experience in...",
+                "rating": 4.5
+            }
+        }
+
+        return jsonify(user_data), 200
 
 @bp.route('/api/orgprofile', methods=['GET'])
 def orgprofile():
-    # Hardcoded user data for an organization
-    user_data = {
-        "user": {
-            "id": 1,
-            "email": "org@example.com",
-            "org_name": "Example Nonprofit",
-            "org_url": "https://www.examplenonprofit.org",
-            "description": "We are dedicated to...",
-            "profile_urls": {
-                "facebook": "https://www.facebook.com/examplenonprofit",
-                "twitter": "https://twitter.com/examplenonprofit"
-            },
-            "contact_name": "Jane Smith",
-            "contact_email": "contact@examplenonprofit.org",
-            "org_type": "Environmental",
-            "cause_categories": ["Conservation", "Education"],
-            "created_at": "2024-10-27T02:52:20"
-        }
-    }
+    # Query the latest organization added to the database
+    latest_organization = Organization.query.order_by(Organization.created_at.desc()).first()
 
-    return jsonify(user_data), 200
+    if latest_organization:
+        user_data = latest_organization.to_dict()
+        return jsonify({"user": user_data}), 200
+    else:
+        # Hardcoded user data for an organization
+        user_data = {
+            "user": {
+                "id": 1,
+                "email": "org@example.com",
+                "org_name": "Example Nonprofit",
+                "org_url": "https://www.examplenonprofit.org",
+                "description": "We are dedicated to...",
+                "profile_urls": {
+                    "facebook": "https://www.facebook.com/examplenonprofit",
+                    "twitter": "https://twitter.com/examplenonprofit"
+                },
+                "contact_name": "Jane Smith",
+                "contact_email": "contact@examplenonprofit.org",
+                "org_type": "Environmental",
+                "cause_categories": ["Conservation", "Education"],
+                "created_at": "2024-10-27T02:52:20"
+            }
+        }
+
+        return jsonify(user_data), 200
 
 @bp.route('/api/opportunities', methods=['GET'])
 def get_opportunities():
